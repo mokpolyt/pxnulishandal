@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PenulisHandal</title>
+<meta name="description" content="Ruang berbagi tulisan, ide, dan percakapan.">
+<style>
+:root{--bg:#fff;--ink:#161616;--muted:#777;--line:#e8e8e8;--soft:#f5f5f5;--accent:#111;--blue:#dff4ff}
+*{box-sizing:border-box}body{margin:0;background:#fafafa;color:var(--ink);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:680px;margin:auto;min-height:100vh;background:var(--bg);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+header{position:sticky;top:0;z-index:5;background:#ffffffed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.7px}.brand span{color:#777}.tagline{font-size:12px;color:var(--muted);margin-top:1px}
+main{padding:0 20px 28px}.composer{padding:20px 0;border-bottom:1px solid var(--line)}
+.composer-title{font-weight:750;margin-bottom:12px}.name-row{display:flex;gap:10px;margin-bottom:10px}
+input,textarea{width:100%;border:1px solid #dedede;border-radius:12px;padding:11px 13px;background:#fff;outline:none}
+input:focus,textarea:focus{border-color:#999}textarea{min-height:94px;resize:vertical}
+.composer-tools{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:10px;flex-wrap:wrap}
+.file-label{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line);border-radius:999px;font-size:14px;cursor:pointer}
+.file-label input{display:none}.primary{border:0;background:#111;color:white;border-radius:999px;padding:10px 19px;font-weight:700}.primary:disabled{opacity:.5;cursor:wait}
+#imagePreview{display:none;max-width:180px;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px}
+.notice{font-size:12px;color:var(--muted);margin-top:8px}
+.tabs{display:flex;justify-content:space-around;border-bottom:1px solid var(--line);margin:0 -20px;padding:0 20px}
+.tab{padding:14px 10px;color:var(--muted);font-weight:650}.tab.active{color:#111;border-bottom:2px solid #111}
+.feed{min-height:200px}.post{display:flex;gap:12px;padding:19px 0;border-bottom:1px solid var(--line)}
+.avatar{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:grid;place-items:center;background:#e9e9e9;font-weight:800;color:#555;text-transform:uppercase}
+.post-main{min-width:0;flex:1}.post-head{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}.author{font-weight:750}.handle,.time{color:var(--muted);font-size:13px}.post-text{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px}
+.post-image{display:block;width:100%;max-height:480px;object-fit:cover;border-radius:15px;border:1px solid var(--line);margin-top:12px}
+.actions{display:flex;gap:22px;margin-top:13px;color:#666}.action{display:flex;align-items:center;gap:7px;border:0;background:transparent;color:inherit;padding:2px 0}.action:hover{color:#111}.action svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7}
+.reply-box{display:none;margin-top:13px}.reply-box textarea{min-height:72px}.reply-box .reply-controls{display:flex;justify-content:flex-end;margin-top:8px}
+.replies{margin-top:14px;padding-left:12px;border-left:2px solid var(--line)}.reply{padding:9px 0 5px}.reply .post-text{margin-top:3px;font-size:14px}
+.pagination{display:flex;justify-content:center;align-items:center;gap:14px;padding:22px 0}.page-btn{border:1px solid var(--line);background:white;border-radius:999px;padding:9px 14px}.page-btn:disabled{opacity:.35;cursor:not-allowed}.page-label{font-size:13px;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:45px 10px}.status{font-size:13px;color:var(--muted);padding:12px 0}.status.error{color:#b42318}
+footer{text-align:center;color:#999;font-size:12px;padding:20px;border-top:1px solid var(--line)}
+@media(max-width:520px){header{padding:14px 15px}main{padding:0 15px 20px}.tabs{margin:0 -15px;padding:0 15px}.actions{gap:18px}.post{gap:10px}.avatar{width:38px;height:38px;flex-basis:38px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><div class="brand">Penulis<span>Handal</span></div><div class="tagline">Tempat ide bertemu percakapan.</div></div><div aria-hidden="true">✍️</div></header>
+<main>
+<section class="composer">
+<div class="composer-title">Mulai percakapan</div>
+<div class="name-row"><input id="author" maxlength="40" placeholder="Nama penulis (contoh: Rani)" aria-label="Nama penulis"></div>
+<textarea id="content" maxlength="2000" placeholder="Apa yang sedang kamu pikirkan?" aria-label="Isi postingan"></textarea>
+<img id="imagePreview" alt="Pratinjau gambar">
+<div class="composer-tools"><label class="file-label">＋ Tambah gambar <input id="imageFile" type="file" accept="image/*"></label><button id="postBtn" class="primary">Posting</button></div>
+<div class="notice">Tanpa login. Gunakan nama samaran jika ingin. Maksimal 2.000 karakter.</div>
+</section>
+<div class="tabs"><div class="tab active">Untuk kamu</div><div class="tab">Terbaru</div></div>
+<div id="status" class="status">Menghubungkan ke PenulisHandal…</div>
+<section id="feed" class="feed"></section>
+<nav class="pagination" aria-label="Navigasi halaman"><button id="prevBtn" class="page-btn">← Sebelumnya</button><span id="pageLabel" class="page-label">Halaman 1</span><button id="nextBtn" class="page-btn">Berikutnya →</button></nav>
+</main>
+<footer>PenulisHandal · Berbagi ide dengan bijak.</footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/*
+  SETUP:
+  1. Isi SUPABASE_URL dan SUPABASE_ANON_KEY di bawah.
+  2. Jalankan schema.sql pada Supabase SQL Editor.
+  3. Buat bucket Storage bernama "post-images" (public).
+*/
+const SUPABASE_URL = "https://nuzigytcmwqwjzufosxo.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_QCQN5gFX7HnDBSPWe1TsRQ_4GJmzVrJ";
+const PAGE_SIZE = 12;
+const sbReady = SUPABASE_URL.startsWith("https://") &&
+  !SUPABASE_ANON_KEY.includes("PASTE_") &&
+  window.supabase;
+const db = sbReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let page = 1;
+let selectedImage = null;
+const $ = id => document.getElementById(id);
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const timeAgo = value => {
+  const mins = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 60000));
+  if (mins < 1) return "baru saja";
+  if (mins < 60) return mins + " mnt";
+  if (mins < 1440) return Math.floor(mins/60) + " jam";
+  return Math.floor(mins/1440) + " hari";
+};
+const icon = name => name === "reply"
+ ? '<svg viewBox="0 0 24 24"><path d="M9 10 4 15l5 5"/><path d="M4 15h9a6 6 0 0 0 6-6V5"/></svg>'
+ : '<svg viewBox="0 0 24 24"><path d="M21 3 10 14"/><path d="m21 3-7 18-4-7-7-4Z"/></svg>';
+function setStatus(message, error=false){$("status").textContent=message;$("status").className="status"+(error?" error":"");}
+$("imageFile").addEventListener("change", e => {
+  const file=e.target.files[0]; selectedImage=file||null;
+  if(file){ if(!file.type.startsWith("image/")){setStatus("File harus berupa gambar.",true);return;}
+    if(file.size>5*1024*1024){selectedImage=null;e.target.value="";setStatus("Ukuran gambar maksimal 5 MB.",true);return;}
+    $("imagePreview").src=URL.createObjectURL(file);$("imagePreview").style.display="block";
+  } else {$("imagePreview").style.display="none";}
+});
+async function loadPosts(){
+  if(!db){setStatus("Setup diperlukan: masukkan URL dan anon key Supabase di index.html.",true);$("feed").innerHTML='<div class="empty">Aplikasi hampir siap. Hubungkan ke Supabase mengikuti README.md.</div>';return;}
+  setStatus("Memuat postingan…");
+  const from=(page-1)*PAGE_SIZE, to=from+PAGE_SIZE-1;
+  const {data,error,count}=await db.from("posts").select("id, author, content, image_url, created_at, replies(id, author, content, created_at)",{count:"exact"}).order("created_at",{ascending:false}).range(from,to);
+  if(error){setStatus("Gagal memuat data: "+error.message,true);return;}
+  $("feed").innerHTML="";
+  if(!data.length){$("feed").innerHTML='<div class="empty">Belum ada postingan di halaman ini.</div>';}
+  data.forEach(post=>$("feed").insertAdjacentHTML("beforeend",renderPost(post)));
+  document.querySelectorAll("[data-reply-toggle]").forEach(btn=>btn.addEventListener("click",()=>{const box=document.getElementById("reply-"+btn.dataset.replyToggle);box.style.display=box.style.display==="block"?"none":"block";}));
+  document.querySelectorAll("[data-reply-send]").forEach(btn=>btn.addEventListener("click",()=>sendReply(btn.dataset.replySend)));
+  $("pageLabel").textContent=`Halaman ${page}${count!=null?" · "+count+" postingan":""}`;
+  $("prevBtn").disabled=page===1;$("nextBtn").disabled=data.length<PAGE_SIZE;
+  setStatus("");
+}
+function renderPost(p){
+ const replies=(p.replies||[]).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+ const replyHTML=replies.map(r=>`<div class="reply"><div class="post-head"><span class="author">${escapeHTML(r.author)}</span><span class="time">${timeAgo(r.created_at)}</span></div><div class="post-text">${escapeHTML(r.content)}</div></div>`).join("");
+ return `<article class="post"><div class="avatar">${escapeHTML((p.author||"P").trim().slice(0,1))}</div><div class="post-main"><div class="post-head"><span class="author">${escapeHTML(p.author||"Penulis")}</span><span class="handle">@${escapeHTML((p.author||"penulis").toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20)||"penulis")}</span><span class="time">· ${timeAgo(p.created_at)}</span></div><div class="post-text">${escapeHTML(p.content)}</div>${p.image_url?`<img class="post-image" src="${escapeHTML(p.image_url)}" alt="Gambar postingan" loading="lazy">`:""}<div class="actions"><button class="action" data-reply-toggle="${p.id}">${icon("reply")}<span>${replies.length} Balas</span></button><button class="action" data-reply-toggle="${p.id}">${icon("share")}<span>Bagikan</span></button></div><div class="reply-box" id="reply-${p.id}"><input id="reply-name-${p.id}" maxlength="40" placeholder="Nama kamu"><textarea id="reply-content-${p.id}" maxlength="1000" placeholder="Tulis balasan…"></textarea><div class="reply-controls"><button class="primary" data-reply-send="${p.id}">Kirim balasan</button></div></div>${replies.length?`<div class="replies">${replyHTML}</div>`:""}</div></article>`;
+}
+async function uploadImage(file){
+ const ext=(file.name.split(".").pop()||"jpg").replace(/[^a-z0-9]/gi,"").toLowerCase()||"jpg";
+ const path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+ const {error}=await db.storage.from("post-images").upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+ if(error)throw error;
+ return db.storage.from("post-images").getPublicUrl(path).data.publicUrl;
+}
+$("postBtn").addEventListener("click",async()=>{
+ if(!db)return;
+ const author=$("author").value.trim(), content=$("content").value.trim();
+ if(!author){setStatus("Isi nama penulis dulu.",true);$("author").focus();return;}
+ if(!content&&!selectedImage){setStatus("Tulis sesuatu atau tambahkan gambar.",true);return;}
+ $("postBtn").disabled=true;setStatus("Mengirim postingan…");
+ try{
+  let image_url=null;if(selectedImage)image_url=await uploadImage(selectedImage);
+  const {error}=await db.from("posts").insert({author,content,image_url});
+  if(error)throw error;
+  $("content").value="";$("imageFile").value="";selectedImage=null;$("imagePreview").style.display="none";page=1;await loadPosts();
+ }catch(e){setStatus("Posting gagal: "+e.message,true);}
+ finally{$("postBtn").disabled=false;}
+});
+async function sendReply(id){
+ const author=$("reply-name-"+id).value.trim(),content=$("reply-content-"+id).value.trim();
+ if(!author||!content){setStatus("Isi nama dan teks balasan.",true);return;}
+ const btn=document.querySelector(`[data-reply-send="${id}"]`);btn.disabled=true;
+ const {error}=await db.from("replies").insert({post_id:id,author,content});
+ btn.disabled=false;
+ if(error){setStatus("Balasan gagal: "+error.message,true);return;}
+ await loadPosts();
+ const box=$("reply-"+id);if(box)box.style.display="block";
+}
+$("prevBtn").addEventListener("click",()=>{if(page>1){page--;loadPosts();window.scrollTo({top:0,behavior:"smooth"});}});
+$("nextBtn").addEventListener("click",()=>{page++;loadPosts();window.scrollTo({top:0,behavior:"smooth"});});
+loadPosts();
+</script>
+</body>
+</html>
